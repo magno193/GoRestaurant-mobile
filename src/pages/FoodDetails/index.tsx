@@ -96,8 +96,7 @@ const FoodDetails: React.FC = () => {
   useEffect(() => {
     async function loadFavorite(): Promise<void> {
       try {
-        const response = await api.get(`/favorites/${routeParams.id}`);
-        const data = response.data as Omit<Food, 'formattedPrice' | 'extras'>;
+        await api.get(`/favorites/${routeParams.id}`);
         setIsFavorite(true);
       } catch {
         console.log('No favorite');
