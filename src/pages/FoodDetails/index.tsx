@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useLayoutEffect,
 } from 'react';
-import { Image } from 'react-native';
+import { Alert, Image } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -58,6 +58,15 @@ interface Food {
   image_url: string;
   formattedPrice: string;
   extras: Extra[];
+
+  thumbnail_url?: number;
+  category?: number;
+}
+
+interface Order extends Omit<Food, 'id' | 'image_url' | 'formattedPrice'> {
+  product_id: number;
+  thumbnail_url?: number;
+  category?: number;
 }
 
 const FoodDetails: React.FC = () => {
@@ -74,20 +83,21 @@ const FoodDetails: React.FC = () => {
   useEffect(() => {
     async function loadFood(): Promise<void> {
       const response = await api.get(`/foods/${routeParams.id}`);
-      const data = response.data as Food;
+      const foodResponse: Food = response.data;
       setFood({
-        ...data,
-        formattedPrice: formatValue(data.price),
+        ...foodResponse,
+        formattedPrice: formatValue(foodResponse.price),
       });
-      const extraData = data.extras.map((extra: Extra) => {
+      const extraResponse: Extra[] = foodResponse.extras;
+
+      const newExtraData = extraResponse.map(extra => {
         return {
-          id: extra.id,
-          name: extra.name,
-          value: extra.value,
+          ...extra,
           quantity: 0,
         };
       });
-      setExtras(extraData);
+
+      setExtras(newExtraData);
     }
 
     loadFood();
@@ -160,13 +170,32 @@ const FoodDetails: React.FC = () => {
     const extrasPrice =
       extras.reduce((acc, extra) => acc + extra.value, 0) *
       extras.reduce((acc, extra) => acc + extra.quantity, 0);
-    const totalPrice = (food.price + extrasPrice) * foodQuantity;
+    const totalPrice =
+      (Number(food.price) + Number(extrasPrice)) * foodQuantity;
     return formatValue(totalPrice);
   }, [extras, food, foodQuantity]);
 
   async function handleFinishOrder(): Promise<void> {
-    // Finish the order and save on the API
-    await api.post('Orders', food);
+    const order: Order = {
+      product_id: food.id,
+      price: food.price,
+      description: food.description,
+      name: food.name,
+      category: food.category,
+      thumbnail_url: food.thumbnail_url,
+      extras,
+    };
+
+    await api.post('Orders', order);
+    Alert.alert(
+      'Pedido Finalizado!',
+      'Aguarde um momento para seu pedido chegar.',
+      [
+        {
+          onPress: () => navigation.goBack(),
+        },
+      ],
+    );
   }
 
   // Calculate the correct icon name

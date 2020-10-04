@@ -68,8 +68,9 @@ const Dashboard: React.FC = () => {
         },
       });
 
+      const foodsResponse: Food[] = response.data;
       setFoods(
-        response.data.map((food: Food) => ({
+        foodsResponse.map(food => ({
           ...food,
           formattedPrice: formatValue(food.price),
         })),
@@ -89,11 +90,9 @@ const Dashboard: React.FC = () => {
   }, []);
 
   function handleSelectCategory(id: number): void {
-    if (selectedCategory === id) {
-      setSelectedCategory(undefined);
-    } else {
-      setSelectedCategory(id);
-    }
+    selectedCategory === id
+      ? setSelectedCategory(undefined)
+      : setSelectedCategory(id);
   }
 
   return (
