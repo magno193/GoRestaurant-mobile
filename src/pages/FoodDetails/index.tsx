@@ -192,7 +192,7 @@ const FoodDetails: React.FC = () => {
       'Aguarde um momento para seu pedido chegar.',
       [
         {
-          onPress: () => navigation.goBack(),
+          onPress: () => navigation.navigate('Home'),
         },
       ],
     );
