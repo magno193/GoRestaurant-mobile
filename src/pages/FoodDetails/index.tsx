@@ -119,9 +119,7 @@ const FoodDetails: React.FC = () => {
     const newExtra = extras.map(extra => {
       if (extra.id === id) {
         return {
-          id: extra.id,
-          name: extra.name,
-          value: extra.value,
+          ...extra,
           quantity: extra.quantity + 1,
         };
       }
@@ -135,9 +133,7 @@ const FoodDetails: React.FC = () => {
       if (extra.id === id) {
         if (extra.quantity > 0) {
           return {
-            id: extra.id,
-            name: extra.name,
-            value: extra.value,
+            ...extra,
             quantity: extra.quantity - 1,
           };
         }
@@ -172,7 +168,7 @@ const FoodDetails: React.FC = () => {
       extras.reduce((acc, extra) => acc + extra.quantity, 0);
     const totalPrice =
       (Number(food.price) + Number(extrasPrice)) * foodQuantity;
-    return formatValue(totalPrice);
+    return String(formatValue(totalPrice));
   }, [extras, food, foodQuantity]);
 
   async function handleFinishOrder(): Promise<void> {
